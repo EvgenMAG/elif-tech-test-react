@@ -1,12 +1,15 @@
 
 import React, { useState, useEffect} from 'react';
 
+import { useDispatch, useSelector } from 'react-redux';
+import { Operations, Selectors } from '../../redux/contacts';
+
 import s from './Calculator.module.css';
 
 
 
 export default function  MortgageCalculator(){
-    const [store, setStore] = useState([]);
+    // const [store, setStore] = useState([]);
     const [bank, setBank] = useState({ name: '', interestRate: '', maxLoan: '' , minDownPay: '',loanTerm:'', id: '' });
     const [unit, setUnit] = useState({loanAmount:'',months:'', minPayOut: ''}); 
     const [result, setResult] = useState('');
@@ -14,6 +17,19 @@ export default function  MortgageCalculator(){
     const {loanAmount, months, minPayOut} = unit
     
     
+    const initContacts = useDispatch();
+    useEffect(() => {
+      initContacts(Operations.getContacts());
+      // setStore((prevState)=> !data? [...prevState] : [...data])
+    }, [initContacts]);
+
+   
+    
+    const banksList = useSelector(Selectors.getAllContacts);
+    
+    console.log(banksList);
+   
+
     const handleChange = e => {
         const { name, value } = e.currentTarget;
         switch (name) {
@@ -37,7 +53,6 @@ export default function  MortgageCalculator(){
         const P = Number(loanAmount)
         const m = Number(months)
         const i = Number(interestRate)
-        const minPayment = Number(minDownPay)
         const remainAmount = P - minPayOut
         
         
@@ -54,19 +69,19 @@ export default function  MortgageCalculator(){
 
       
 
-    useEffect(()=>{
-        const saved = localStorage.getItem("bank");
-        const dataFromLocalStorage = JSON.parse(saved);
+    // useEffect(()=>{
+    //     const saved = localStorage.getItem("bank");
+    //     const dataFromLocalStorage = JSON.parse(saved);
        
-        setStore((prevState)=> !dataFromLocalStorage? [...prevState] : [...dataFromLocalStorage])
+    //     setStore((prevState)=> !dataFromLocalStorage? [...prevState] : [...dataFromLocalStorage])
        
-        },[localStorage.getItem("bank")])
+    //     },[localStorage.getItem("bank")])
  
 
      const onChoosingBank =(e)=>{
          
          const id = e.target.value
-         const currentBank = store.find((item)=> item.id === id)
+         const currentBank = banksList.find((item)=> item._id === id)
          setBank(()=> currentBank? currentBank: { name: '', interestRate: '', maxLoan: '' , minDownPay: '',loanTerm:'', id: '' })
          reset()
      }
@@ -96,7 +111,7 @@ export default function  MortgageCalculator(){
   <select 
     onChange={onChoosingBank}>
     <option></option>
-    {store.map((item)=> <option key={item.id} value={item.id}>{item.name}</option>)}
+    {banksList.map((item)=> <option key={item._id} value={item._id}>{item.name}</option>)}
   </select>
   </label>
   

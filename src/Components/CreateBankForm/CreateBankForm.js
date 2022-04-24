@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useSyncExternalStore } from 'react';
 
-import { v4 as uuidv4 } from 'uuid'
+// import { v4 as uuidv4 } from 'uuid'
+
+import { useDispatch, useSelector } from 'react-redux';
+import { Operations, Selectors } from '../../redux/contacts';
+import Loading from '../Loading/Loader';
 
 import s from './CreateBankForm.module.css';
 import basket from '../../img/basket3.png'
@@ -10,21 +14,32 @@ import edit from '../../img/edit.png'
 
 
 export default function CreateBankForm() {
-  const [user, setUser] = useState({ name: '', interestRate: '', maxLoan: '' , minDownPay: '',loanTerm:'', id: '' });
-  const [store, setStore] = useState([]);
+  const [bank, setBank] = useState({ name: '', interestRate: '', maxLoan: '' , minDownPay: '',loanTerm:'' });
+  // const [store, setStore] = useState([]);
 
+   
+  const { name, interestRate, maxLoan, minDownPay, loanTerm} = bank;
 
-  const { name, interestRate, maxLoan, minDownPay, loanTerm,id} = user;
+  console.log(bank);
 
+  // useEffect(()=>{
+  // const saved = localStorage.getItem("bank");
+  // const dataFromLocalStorage = JSON.parse(saved);
   
-
-  useEffect(()=>{
-  const saved = localStorage.getItem("bank");
-  const dataFromLocalStorage = JSON.parse(saved);
-  
-  setStore((prevState)=> !dataFromLocalStorage? [...prevState] : [...dataFromLocalStorage])
+  // setStore((prevState)=> !dataFromLocalStorage? [...prevState] : [...dataFromLocalStorage])
  
-  },[localStorage.getItem("bank")])
+  // },[localStorage.getItem("bank")])
+
+
+  const initContacts = useDispatch();
+    useEffect(() => {
+      initContacts(Operations.getContacts());
+    }, [initContacts]);
+
+   
+    
+    const banksList = useSelector(Selectors.getAllContacts);
+    console.log(banksList);
 
   
 
@@ -33,52 +48,78 @@ export default function CreateBankForm() {
     const { name, value } = e.currentTarget;
     switch (name) {
       case 'name':
-        setUser(prevState => ({ ...prevState, [name]: value }));
+        setBank(prevState => ({ ...prevState, [name]: value }));
         break;
       case 'interestRate':
-        setUser(prevState => ({ ...prevState, [name]: value }));
+        setBank(prevState => ({ ...prevState, [name]: value }));
         break;
       case 'maxLoan':
-        setUser(prevState => ({ ...prevState, [name]: value }));
+        setBank(prevState => ({ ...prevState, [name]: value }));
         break;
       case 'minDownPay':
-        setUser(prevState => ({ ...prevState, [name]: value }));
+        setBank(prevState => ({ ...prevState, [name]: value }));
         break;
       case 'loanTerm':
-        setUser(prevState => ({ ...prevState, [name]: value }));
+        setBank(prevState => ({ ...prevState, [name]: value }));
         break;
       default:
         console.log("There aren't such data");
     }
   };
 
+  const addContact = useDispatch();
+  const updateContact = useDispatch();
+  
   const handleSubmit = e => {
     e.preventDefault();
-    const userId = !user.id? { name, interestRate, maxLoan, minDownPay, loanTerm,  id: uuidv4() }:
-    { name, interestRate, maxLoan, minDownPay, loanTerm,  id }
-    const editedList = store.filter((item)=> item.id !== userId.id) 
-   
-    localStorage.setItem("bank", JSON.stringify([...editedList, userId]))
+    console.log(bank);
+    console.log(!banksList.length);
+    if(banksList.length===0) {
+      addContact(Operations.addContact(bank))
+      reset();
+    }else{
+      banksList.find((item)=> {
+        if(item._id === bank._id){
+         updateContact(Operations.updateContact(item._id, { name, interestRate, maxLoan, minDownPay, loanTerm} ))
+         reset();
+        }else{
+          addContact(Operations.addContact(bank))
+          reset();
+        }
+      })
+      
+    }
     
-    reset();
+ 
+    
+    
+    
+    // const userId = !user.id? { name, interestRate, maxLoan, minDownPay, loanTerm }:
+    // { name, interestRate, maxLoan, minDownPay, loanTerm }
+    // const editedList = store.filter((item)=> item.id !== userId.id) 
+   
+    // localStorage.setItem("bank", JSON.stringify([...editedList, userId]))
+    // addContact(Operations.addContact(bank))
+    // reset();
   };
 
   const reset = () => {
-    setUser({ name: '', interestRate: '', maxLoan: '' , minDownPay: '',loanTerm:'' });
+    setBank({ name: '', interestRate: '', maxLoan: '' , minDownPay: '',loanTerm:'' });
    
   };
 
+  const deleteContact = useDispatch();
   const deleteItem =id=>{
-   const  updatedList = store.filter((item)=> item.id !== id)
-    setStore(() => updatedList )
-   localStorage.setItem("bank", JSON.stringify(updatedList))
+  deleteContact(Operations.deleteContact(id))
   
   }
 
+  // const updateContact = useDispatch();
+  // updateContact(Operations.updateContact(id))
   const editItem = id => {
-    const  item = store.find((item)=> item.id === id)
-    setUser(() => item )
-
+    const  item = banksList.find((item)=> item._id === id)
+    setBank(() => item )
+    
   }
 
 
@@ -155,7 +196,7 @@ export default function CreateBankForm() {
     </div>
     <div className={s.banksContainer}>
 
-    { store.length > 0 && 
+    { banksList.length > 0 && 
         <div >
           <h1 className={s.title}>Bank List</h1>
           <table>
@@ -169,17 +210,17 @@ export default function CreateBankForm() {
               </tr>
          </thead>
          <tbody> 
-    { store.map((item)=>
-    <tr key={item.id} >
+    {  banksList.map((item)=>
+    <tr key={item._id} >
     <td className={s.bankName}>{item.name}</td>
     <td className={s.tabData}>{item.interestRate}</td>
     <td className={s.tabData}>{item.maxLoan}</td>
     <td className={s.tabData}>{item.minDownPay}</td>
     <td className={s.tabData}>{item.loanTerm}</td>
-    <td  onClick={()=> deleteItem(item.id)} >
+    <td  onClick={()=> deleteItem(item._id)} >
       <img className = {s.deleteBtn} src={basket}></img>  
      </td>
-    <td  onClick={()=> editItem(item.id)} >
+    <td  onClick={()=> editItem(item._id)} >
     <img className = {s.deleteBtn} src={edit}></img>
     </td>
   </tr>        

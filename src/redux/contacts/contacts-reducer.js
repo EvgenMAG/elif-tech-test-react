@@ -8,21 +8,25 @@ import {
     getContactsRequest,
     getContactsSuccess,
     getContactsError,
-    filterContacts,
+    updateContactRequest,
+  updateContactSuccess,
+  updateContactError
+  
   } from './contacts-actions';
   
   import { createReducer } from '@reduxjs/toolkit';
   
   const initialState = [];
   
-  const initialFilter = '';
+  
   
   // ========ToolKit =======
   const itemsReducers = createReducer(initialState, {
     [getContactsSuccess]: (_, { payload }) => payload,
     [addContactSuccess]: (state, { payload }) => [...state, payload],
+    [updateContactSuccess]: (state, { payload }) => [...state, payload],
     [deleteContactSuccess]: (state, { payload }) =>
-      state.filter(contact => contact.id !== payload),
+      state.filter(contact => contact._id !== payload),
   });
   
   const loading = createReducer(false, {
@@ -37,10 +41,7 @@ import {
     [getContactsError]: () => false,
   });
   
-  const filterReducer = createReducer(initialFilter, {
-    [filterContacts]: (_, { payload }) => payload,
-  });
   
-  const reducers = { itemsReducers, filterReducer, loading };
+  const reducers = { itemsReducers,  loading };
   
   export default reducers;
