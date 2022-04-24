@@ -55,11 +55,14 @@ const deleteContact = id => async dispatch => {
 
 const updateContact = (id, contact) => async dispatch => {
     dispatch(updateContactRequest());
+    console.log(contact);
+    console.log(id);
   
     try {
     const {data} = await axios.put(`/api/contacts/${id}`,contact);
     console.log(data.data.contact)
-      dispatch(updateContactSuccess(data.data.contact));
+    const updatedData = data.data.contact
+      dispatch(updateContactSuccess({id, updatedData}));
     } catch (error) {
       dispatch(updateContactError(error.message));
     }

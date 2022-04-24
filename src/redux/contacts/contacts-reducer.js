@@ -24,7 +24,7 @@ import {
   const itemsReducers = createReducer(initialState, {
     [getContactsSuccess]: (_, { payload }) => payload,
     [addContactSuccess]: (state, { payload }) => [...state, payload],
-    [updateContactSuccess]: (state, { payload }) => [...state, payload],
+    [updateContactSuccess]: (state, { payload }) => [...state.filter(contact => contact._id !== payload.id), payload.updatedData],
     [deleteContactSuccess]: (state, { payload }) =>
       state.filter(contact => contact._id !== payload),
   });

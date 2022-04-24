@@ -20,8 +20,6 @@ export default function CreateBankForm() {
    
   const { name, interestRate, maxLoan, minDownPay, loanTerm} = bank;
 
-  console.log(bank);
-
   // useEffect(()=>{
   // const saved = localStorage.getItem("bank");
   // const dataFromLocalStorage = JSON.parse(saved);
@@ -72,22 +70,24 @@ export default function CreateBankForm() {
   
   const handleSubmit = e => {
     e.preventDefault();
-    console.log(bank);
-    console.log(!banksList.length);
-    if(banksList.length===0) {
+    
+   
+    if(banksList.length===0) { 
+      console.log("Hi");
       addContact(Operations.addContact(bank))
       reset();
-    }else{
+    } else if(banksList && bank._id){
       banksList.find((item)=> {
         if(item._id === bank._id){
          updateContact(Operations.updateContact(item._id, { name, interestRate, maxLoan, minDownPay, loanTerm} ))
          reset();
-        }else{
-          addContact(Operations.addContact(bank))
-          reset();
+         
         }
       })
       
+    }else {
+      addContact(Operations.addContact(bank))
+      reset();
     }
     
  
