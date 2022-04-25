@@ -21,14 +21,17 @@ This section should list any major frameworks that I used to built the project. 
 
 ## Backend
 
-
-<a href="https://github.com/" title="GitHub"><img height="200" src="assets/icons/mongodb.png" /></a>
+<a href="https://github.com/" title="GitHub"><img height="100" src="assets/icons/express.png" /></a>
+<a href="https://github.com/" title="GitHub"><img height="100" src="assets/icons/mongodb.png" /></a>
 
 Talking about what is going on under the skin?
 
 Backend has been built on Express using database connected to MongoDB.
 
 ## Frontend
+
+<a href="https://github.com/" title="GitHub"><img height="100" src="assets/icons/react.png" /></a>
+<a href="https://github.com/" title="GitHub"><img height="100" src="assets/icons/redux.png" /></a>
 
 Frontend has been built using React and Redux,thanks God for these libraries!
 
